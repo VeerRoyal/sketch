@@ -1,0 +1,22 @@
+# Save as sketch_app.py
+import streamlit as st
+import cv2
+import numpy as np
+from PIL import Image
+
+def convert_to_sketch(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    inv = 255 - gray
+    blur = cv2.GaussianBlur(inv, (21, 21), 0)
+    inv_blur = 255 - blur
+    sketch = cv2.divide(gray, inv_blur, scale=256.0)
+    return sketch
+
+st.title("🖼️ Photo to Pencil Sketch")
+uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "png", "jpeg"])
+
+if uploaded_file is not None:
+    img = Image.open(uploaded_file)
+    img_cv = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+    sketch = convert_to_sketch(img_cv)
+    st.image(sketch, caption='Pencil Sketch', use_column_width=True)
